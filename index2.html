@@ -1,0 +1,97 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Työkuittaus</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    button { padding: 15px; margin: 10px 0; width: 100%; font-size: 18px; }
+    input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <div style="text-align:center; margin-bottom:20px;">
+  <img src="logo.png" alt="Logo" style="max-width:200px; width:100%;">
+</div>
+
+
+
+<h2 id="kohde"></h2>
+
+<label>Työntekijä</label>
+<select id="tyontekija">
+  <option>Juha-Matti</option>
+  <option>Sini</option>
+  <option>Leo</option>
+  <option>Alisa</option>
+  <option>Laura</option>
+  <option>Kumi-Keijo</option>
+  <option>Tuuraaja 1</option>
+  <option>Johanna</option>
+  <option>Ludmila</option>
+  <option>Herkko-Petteri</option>
+</select>
+
+<label>PIN</label>
+<input type="password" id="pin" placeholder="PIN">
+
+<div id="huomiotBox" style="display:none;">
+  <label>Huomiot</label>
+  <textarea id="huomiot" placeholder="Kirjoita tähän..."></textarea>
+</div>
+
+<button onclick="laheta('ALOITUS')">🟢 Aloita työ</button>
+<button onclick="naytaHuomiot()">🔴 Lopeta työ</button>
+
+<button id="confirmStop" style="display:none;" onclick="laheta('LOPETUS')">
+  ✅ Vahvista lopetus
+</button>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxizB26S2wJTv0VC8UYq-YKwz3EiJ7SxvWzcii9q7WqWxRVWuBQqnS6EB-KaTdIE6gQ/exec";
+
+const PIN_KOODI = "1234";
+
+const params = new URLSearchParams(window.location.search);
+const kohde = params.get("kohde") || "As. Oy Armilax";
+
+document.getElementById("kohde").innerText = "Kohde: " + kohde;
+
+function naytaHuomiot() {
+  document.getElementById("huomiotBox").style.display = "block";
+  document.getElementById("confirmStop").style.display = "block";
+}
+
+function laheta(tapahtuma) {
+  const pin = document.getElementById("pin").value;
+  if (pin !== PIN_KOODI) {
+    alert("Väärä PIN!");
+    return;
+  }
+
+  const tyontekija = document.getElementById("tyontekija").value;
+  const huomiot = document.getElementById("huomiot").value;
+
+fetch(API_URL, {
+  method: "POST",
+  mode: "no-cors",
+  body: JSON.stringify({
+      kohde: kohde,
+      tapahtuma: tapahtuma,
+      tyontekija: tyontekija,
+      huomiot: huomiot
+    })
+  })
+  .then(() => {
+    alert("Tallennettu!");
+    document.getElementById("huomiot").value = "";
+  })
+  .catch(() => alert("Virhe lähetyksessä"));
+}
+</script>
+
+</body>
+</html>
